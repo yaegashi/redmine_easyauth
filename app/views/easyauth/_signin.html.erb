@@ -1,0 +1,16 @@
+<%= stylesheet_link_tag 'easyauth', plugin: 'redmine_azure_easyauth' %>
+
+<% if Setting.plugin_redmine_azure_easyauth['enabled'] %>
+  <%= content_tag :div, id: 'easyauth-form' do %>
+    <%= label_tag nil, l('easyauth.label.sign_in_via') %>
+    <%= link_to easyauth_signin_path, class: 'btn' do %>
+      <%= image_tag 'azure.png', plugin: 'redmine_azure_easyauth' %><%= content_tag :span do %>Sign in<% end %>
+    <% end %>
+  <% end %>
+<% end %>
+
+<% if !Setting.plugin_redmine_azure_easyauth['announcement'].blank? %>
+  <%= content_tag :div, id: 'easyauth-announcement' do %>
+    <%=raw Redmine::WikiFormatting.to_html(Setting.text_formatting, Setting.plugin_redmine_azure_easyauth['announcement']) %>
+  <% end %>
+<% end %>
