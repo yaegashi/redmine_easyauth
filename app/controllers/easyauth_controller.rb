@@ -45,6 +45,6 @@ class EasyauthController < AccountController
   end
 
   def settings
-    @settings ||= Setting.plugin_redmine_azure_easyauth
+    @settings ||= Setting.plugin_redmine_easyauth
   end
 end

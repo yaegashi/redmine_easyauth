@@ -1,12 +1,13 @@
 en:
   easyauth:
     label:
-      sign_in_via: Sign in
+      sign_in: Sign in
+      sign_in_easyauth: Easy Auth
     error:
-      authentication_failure: EasyAuth authentication failure
-      authentication_unavailable: EasyAuth authentication unavailable
-      auto_registration_failed: EasyAuth auto registration failed
-      disabled: EasyAuth disabled
+      authentication_failure: Easy Auth authentication failure
+      authentication_unavailable: Easy Auth authentication unavailable
+      auto_registration_failed: Easy Auth auto registration failed
+      disabled: Easy Auth disabled
     setting:
       enabled: Enabled
       auto_registration: Auto registration

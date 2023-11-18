@@ -1,12 +1,13 @@
 ja:
   easyauth:
     label:
-      sign_in_via: サインイン
+      sign_in: サインイン
+      sign_in_easyauth: Easy Auth
     error:
-      authentication_failure: EasyAuth 認証失敗しました
-      authentication_unavailable: EasyAuth 認証情報がありません
-      auto_registration_failed: EasyAuth 自動登録に失敗しました
-      disabled: EasyAuth 認証が無効です
+      authentication_failure: Easy Auth 認証失敗しました
+      authentication_unavailable: Easy Auth 認証情報がありません
+      auto_registration_failed: Easy Auth 自動登録に失敗しました
+      disabled: Easy Auth 認証が無効です
     setting:
       enabled: 有効
       auto_registration: 自動登録
