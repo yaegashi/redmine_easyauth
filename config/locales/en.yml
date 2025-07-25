@@ -1,8 +1,11 @@
 en:
   easyauth:
+    field:
+      login: Login
+      mail: Email
     label:
-      sign_in: Sign in
-      sign_in_easyauth: Easy Auth
+      login: Easy Auth Sign in
+      switch_account: Switch Account
     error:
       authentication_failed: Easy Auth authentication failed
       authentication_unavailable: Easy Auth authentication unavailable
@@ -15,3 +18,6 @@ en:
       auto_registration: Auto registration
       allowed_principal_list: Allowed principal list
       announcement: Announcement
+      mail_org_rules: Mail to org rules
+    help:
+      mail_org_rules: Write regular expressions for email addresses and organization names separated by spaces on each line

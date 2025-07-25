@@ -1,4 +1,6 @@
 class EasyauthController < AccountController
+  include RedmineEasyauthHelper
+
   def easyauth_failure
     flash['error'] = "#{l('easyauth.error.authentication_failed')}: #{params[:message]}"
     redirect_to signin_path
@@ -11,44 +13,18 @@ class EasyauthController < AccountController
       return
     end
 
-    # Extract user principal information from request headers
-    # https://learn.microsoft.com/en-us/azure/app-service/configure-authentication-user-identities
-    # X-MS-CLIENT-PRINCIPAL: Base64 encoded JSON object
-    # X-MS-CLIENT-PRINCIPAL-NAME: User's mail address
-
-    name = request.headers['HTTP_X_MS_CLIENT_PRINCIPAL_NAME']
-    logger.info "easyauth name: #{name.inspect}"
-
-    principal_raw = request.headers['HTTP_X_MS_CLIENT_PRINCIPAL']
-    logger.info "easyauth principal raw: #{principal_raw.inspect}"
-
-    begin
-      principal = JSON.parse(Base64.decode64(principal_raw))
-      raise 'not a hash' unless principal.is_a?(Hash)
-    rescue => e
-      logger.error "easyauth principal decode error: #{e}"
-      principal = {}
-    end
-    logger.info "easyauth principal decoded: #{principal.inspect}"
-
-    if name.blank?
+    login, name, claims = easyauth_claims
+    if login.blank? or name.blank?
       logger.info 'easyauth unavailable'
       flash['error'] = l('easyauth.error.authentication_unavailable')
       redirect_to signin_path
       return
     end
 
-    claims = {}
-    if principal['auth_typ'] == 'aad'
-      principal.fetch('claims', []).each do |claim|
-        k = claim['typ'].to_s
-        v = claim['val'].to_s
-        next if k.blank? || v.blank?
-        claims[k] = claims.fetch(k, []) + [v]
-      end
-    end
-
-    claim_groups = (claims.fetch('groups', []) + [claimis['oid']]).map(&:strip).map(&:downcase).reject(&:blank?).uniq
+    oid1 = claims.fetch('groups', [])
+    oid2 = claims.fetch('oid', [])
+    oid3 = claims.fetch('http://schemas.microsoft.com/identity/claims/objectidentifier', [])
+    claim_groups = (oid1 + oid2 + oid3).map(&:strip).map(&:downcase).reject(&:blank?).uniq
     logger.info "easyauth claim groups: #{claim_groups.inspect}"
 
     allowed_groups = settings['allowed_principal_list'].to_s.split(',').map(&:strip).map(&:downcase).reject(&:blank?).uniq
@@ -68,11 +44,25 @@ class EasyauthController < AccountController
     if user.new_record?
       unless settings['auto_registration']
         logger.info 'easyauth auto registration disabled'
-        flash['error'] = l('easyauth.error.authentication_disabled')
+        flash['error'] = l('easyauth.error.auto_registration_disabled')
         redirect_to signin_path
         return
       end
-      logger.info 'easyauth auto registration not implemented'
+      user.login = (claims.fetch('preferred_username', []) + [name]).first
+      user.mail = name
+      user.firstname = (claims.fetch('name', []) + [name]).first
+      user.lastname =  easyauth_mail_org_translate(name) || EASYAUTH_MAIL_ORG_RULE_DEFAULT
+      user.admin = false
+      user.register
+      user.activate
+      user.last_login_on = Time.now
+      if user.save
+        self.logged_user = user
+        flash[:notice] = l(:notice_account_activated)
+        redirect_to my_account_path
+        return
+      end
+      logger.info 'easyauth auto registration failed'
       flash['error'] = l('easyauth.error.auto_registration_failed')
       redirect_to signin_path
       return
@@ -82,7 +72,8 @@ class EasyauthController < AccountController
       successful_authentication(user)
       return
     end
-    account_pending
+
+    account_pending(user)
   end
 
   def settings

@@ -1,8 +1,11 @@
 ja:
   easyauth:
+    field:
+      login: ログインID
+      mail: メールアドレス
     label:
-      sign_in: サインイン
-      sign_in_easyauth: Easy Auth
+      login: Easy Auth ログイン
+      switch_account: アカウント切り替え
     error:
       authentication_failed: Easy Auth 認証失敗しました
       authentication_unavailable: Easy Auth 認証情報がありません
@@ -15,3 +18,6 @@ ja:
       auto_registration: 自動登録
       allowed_principal_list: 許可プリンシパルリスト
       announcement: アナウンス
+      mail_org_rules: メールアドレス・組織名ルール
+    help:
+      mail_org_rules: 1行ごとに「メールアドレスに対する正規表現」「組織名」を空白で区切って記述してください
